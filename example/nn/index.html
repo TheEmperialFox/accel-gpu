@@ -17,7 +17,8 @@
     h1 { font-size: 1.5rem; margin: 0 0 0.5rem; }
     p { color: var(--text-muted); margin: 0 0 1.5rem; }
     .output { font-family: "IBM Plex Mono", monospace; font-size: 0.9rem; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; line-height: 1.7; }
-    .digit { display: inline-block; width: 1.2em; text-align: center; margin: 0 0.2em; }
+    .probs { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; margin-bottom: 1rem; }
+    .digit { display: inline-block; min-width: 4.5em; padding: 0.15em 0.4em; text-align: right; }
     .digit.winner { color: var(--success); font-weight: 600; }
     .status { font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem; }
   </style>
@@ -73,15 +74,18 @@
         const probs = await softmax(gpu, logits);
         const probsArr = await probs.toArray();
 
-        let html = "Class probabilities: ";
         let maxIdx = 0;
         let maxVal = 0;
         for (let i = 0; i < 10; i++) {
+          if (probsArr[i] > maxVal) { maxVal = probsArr[i]; maxIdx = i; }
+        }
+        let html = '<div class="probs">';
+        for (let i = 0; i < 10; i++) {
           const p = probsArr[i];
-          if (p > maxVal) { maxVal = p; maxIdx = i; }
           html += `<span class="digit ${i === maxIdx ? "winner" : ""}">${i}: ${(p * 100).toFixed(1)}%</span>`;
         }
-        output.innerHTML = html + `<br><br>Predicted digit: <strong>${maxIdx}</strong>`;
+        html += '</div>Predicted digit: <strong>' + maxIdx + '</strong>';
+        output.innerHTML = html;
       } catch (err) {
         output.textContent = "Error: " + err.message;
         output.style.color = "#f85149";
