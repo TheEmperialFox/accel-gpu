@@ -17,7 +17,7 @@
   </style>
 </head>
 <body>
-  <h1>@accel/gpu Benchmarks</h1>
+  <h1>accel-gpu Benchmarks</h1>
   <p>Compare GPU (WebGPU) vs CPU performance. Run with WebGPU enabled for GPU results.</p>
   <div id="status">Initializing...</div>
   <button id="run">Run Benchmarks</button>
@@ -30,7 +30,7 @@
   </table>
 
   <script type="module">
-    import { init, matmul } from "../dist/index.js";
+    import { init, matmul } from "https://esm.sh/accel-gpu";
 
     const status = document.getElementById("status");
     const results = document.getElementById("results");

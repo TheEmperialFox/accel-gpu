@@ -1,7 +1,7 @@
 /**
  * Build site for GitHub Pages - copies static files + dist to deploy folder
  */
-import { cpSync, mkdirSync, rmSync, existsSync } from "fs";
+import { cpSync, mkdirSync, rmSync, existsSync, writeFileSync } from "fs";
 import { join } from "path";
 import { fileURLToPath } from "url";
 
@@ -21,5 +21,8 @@ copy("example");
 copy("benchmark");
 copy("playground");
 copy("dist");
+
+// Prevent Jekyll processing (ensures all files are served)
+writeFileSync(join(deploy, ".nojekyll"), "");
 
 console.log("Site built to deploy/");

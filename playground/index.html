@@ -50,7 +50,7 @@ console.log("chain:", await x.toArray());</textarea>
   </div>
 
   <script type="module">
-    import { init, matmul, softmax, layerNorm } from "../dist/index.js";
+    import { init, matmul, softmax, layerNorm } from "https://esm.sh/accel-gpu";
 
     const codeEl = document.getElementById("code");
     const outputEl = document.getElementById("output");
