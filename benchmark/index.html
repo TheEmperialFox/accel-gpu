@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>@accel/gpu Benchmarks</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+    h1 { color: #333; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th, td { padding: 0.5rem 1rem; text-align: left; border-bottom: 1px solid #ddd; }
+    th { background: #f5f5f5; }
+    .fast { color: #0a0; }
+    .slow { color: #c00; }
+    #status { margin: 1rem 0; padding: 0.5rem; background: #f0f0f0; border-radius: 4px; }
+    button { padding: 0.5rem 1rem; margin: 0.25rem; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>@accel/gpu Benchmarks</h1>
+  <p>Compare GPU (WebGPU) vs CPU performance. Run with WebGPU enabled for GPU results.</p>
+  <div id="status">Initializing...</div>
+  <button id="run">Run Benchmarks</button>
+  <table>
+    <thead>
+      <tr><th>Operation</th><th>Size</th><th>GPU (ms)</th><th>CPU (ms)</th><th>Speedup</th></tr>
+    </thead>
+    <tbody id="results"></tbody>
+  </table>
+
+  <script type="module">
+    import { init, matmul, softmax } from "../dist/index.js";
+
+    const status = document.getElementById("status");
+    const results = document.getElementById("results");
+    const runBtn = document.getElementById("run");
+
+    let gpuCtx = null;
+    let cpuCtx = null;
+
+    async function setup() {
+      try {
+        gpuCtx = await init();
+        cpuCtx = await init({ forceCPU: true });
+        status.textContent = `Backend: ${gpuCtx.backendType}. Ready to benchmark.`;
+      } catch (e) {
+        status.textContent = "Error: " + e.message;
+      }
+    }
+
+    function addRow(op, size, gpuMs, cpuMs) {
+      const speedup = gpuMs > 0 ? (cpuMs / gpuMs).toFixed(2) : "-";
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${op}</td><td>${size}</td><td>${gpuMs.toFixed(2)}</td><td>${cpuMs.toFixed(2)}</td><td class="${gpuMs < cpuMs ? "fast" : "slow"}">${speedup}x</td>`;
+      results.appendChild(tr);
+    }
+
+    async function runBenchmarks() {
+      results.innerHTML = "";
+      runBtn.disabled = true;
+      status.textContent = "Running benchmarks...";
+
+      const sizes = [
+        [1000, "1K"],
+        [10000, "10K"],
+        [100000, "100K"],
+        [1000000, "1M"],
+      ];
+
+      for (const [n, label] of sizes) {
+        const data = new Float32Array(n).fill(1);
+        const a = gpuCtx.array(data);
+        const b = gpuCtx.array(data);
+
+        const gpuStart = performance.now();
+        await a.add(b);
+        await a.sum();
+        const gpuEnd = performance.now();
+
+        const a2 = cpuCtx.array(data);
+        const b2 = cpuCtx.array(data);
+        const cpuStart = performance.now();
+        await a2.add(b2);
+        await a2.sum();
+        const cpuEnd = performance.now();
+
+        addRow("add + sum", label, gpuEnd - gpuStart, cpuEnd - cpuStart);
+      }
+
+      const matmulSizes = [[64, "64×64"], [128, "128×128"], [256, "256×256"]];
+      for (const [n, label] of matmulSizes) {
+        const A = gpuCtx.array(new Float32Array(n * n).fill(0.01), [n, n]);
+        const B = gpuCtx.array(new Float32Array(n * n).fill(0.01), [n, n]);
+
+        const gpuStart = performance.now();
+        await matmul(gpuCtx, A, B);
+        const gpuEnd = performance.now();
+
+        const A2 = cpuCtx.array(new Float32Array(n * n).fill(0.01), [n, n]);
+        const B2 = cpuCtx.array(new Float32Array(n * n).fill(0.01), [n, n]);
+        const cpuStart = performance.now();
+        await matmul(cpuCtx, A2, B2);
+        const cpuEnd = performance.now();
+
+        addRow("matmul", label, gpuEnd - gpuStart, cpuEnd - cpuStart);
+      }
+
+      status.textContent = "Benchmarks complete.";
+      runBtn.disabled = false;
+    }
+
+    runBtn.onclick = runBenchmarks;
+    setup();
+  </script>
+</body>
+</html>

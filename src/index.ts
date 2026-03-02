@@ -1,0 +1,80 @@
+/**
+ * @accel/gpu - NumPy for the browser GPU
+ * Zero shaders, zero dependencies.
+ */
+/// <reference types="@webgpu/types" />
+
+import { createBackend } from "./backend/fallback";
+import { GPUArray } from "./array";
+import type { AccelContext } from "./types";
+import type { WebGPUBackend } from "./backend/webgpu";
+import type { CPUBackend } from "./backend/cpu-backend";
+
+export { GPUArray } from "./array";
+export type { AccelContext } from "./types";
+
+export interface InitOptions {
+  /** Prefer CPU backend (e.g. for testing) */
+  forceCPU?: boolean;
+  /** Run in a Web Worker (future use) */
+  worker?: boolean;
+}
+
+/**
+ * Initialize the Accel GPU context. Uses WebGPU with CPU fallback.
+ */
+export async function init(options?: InitOptions): Promise<AccelContext> {
+  let backend: WebGPUBackend | CPUBackend;
+  let runner: import("./backend/kernel-runner").KernelRunner | import("./backend/cpu-runner").CPURunner;
+  let backendType: "webgpu" | "webgl" | "cpu";
+
+  if (options?.forceCPU) {
+    const cpu = await import("./backend/cpu-backend");
+    const cpuRunner = await import("./backend/cpu-runner");
+    backend = cpu.createCPUBackend();
+    runner = new cpuRunner.CPURunner();
+    backendType = "cpu";
+  } else {
+    const result = await createBackend();
+    backend = result.backend;
+    runner = result.runner;
+    backendType = result.backendType;
+  }
+
+  const ctx: AccelContext = {
+    backend,
+    runner,
+    backendType,
+    array(data: Float32Array | number[], shape?: number[]) {
+      const arr = data instanceof Float32Array ? data : new Float32Array(data);
+      const usage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST;
+      const buffer = backend.createBufferFromData(arr.buffer as ArrayBuffer, usage);
+      return new GPUArray(backend, runner, buffer, arr.length, shape ?? [arr.length]);
+    },
+    fromImageData(imageData: ImageData): GPUArray {
+      const { width, height, data } = imageData;
+      const floats = new Float32Array(width * height * 4);
+      for (let i = 0; i < data.length; i++) floats[i] = data[i] / 255;
+      return ctx.array(floats, [height, width, 4]);
+    },
+    async toCanvas(arr: GPUArray, width: number, height: number): Promise<HTMLCanvasElement> {
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx2d = canvas.getContext("2d")!;
+      const imageData = ctx2d.createImageData(width, height);
+      const data = await arr.toArray();
+      for (let i = 0; i < data.length; i++) {
+        imageData.data[i] = Math.max(0, Math.min(255, Math.round(data[i] * 255)));
+      }
+      ctx2d.putImageData(imageData, 0, 0);
+      return canvas;
+    },
+  };
+
+  return ctx;
+}
+
+export { add, mul, sum, max } from "./ops/math";
+export { matmul, dot, transpose } from "./ops/linear";
+export { softmax, layerNorm, attentionScores } from "./ops/ml";
