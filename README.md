@@ -41,11 +41,11 @@ console.log(await probs.toArray());
 
 ## Demos
 
-- **[Demo](https://your-username.github.io/accel-gpu/example/)** — Basic usage
-- **[Benchmarks](https://your-username.github.io/accel-gpu/benchmark/)** — GPU vs CPU performance
-- **[Playground](https://your-username.github.io/accel-gpu/playground/)** — Interactive code editor
+- **[Demo](https://phantasm0009.github.io/accel-gpu/example/)** — Basic usage
+- **[Benchmarks](https://phantasm0009.github.io/accel-gpu/benchmark/)** — GPU vs CPU performance
+- **[Playground](https://phantasm0009.github.io/accel-gpu/playground/)** — Interactive code editor
 
-Run locally: `npx serve accel-gpu` then open `/`, `/example/`, `/benchmark/`, `/playground/`.
+Run locally: `npx serve .` in the project root, then open `/`, `/example/`, `/benchmark/`, `/playground/`.
 
 ## API
 
@@ -109,6 +109,14 @@ const data = await arr.toArray(); // Float32Array
 
 - **WebGPU**: Chrome 113+, Edge 113+, Safari 18+
 - **CPU fallback**: Works everywhere (Node, headless, older browsers)
+
+## Deploy to GitHub Pages
+
+1. Run `npm run build` to generate `dist/`
+2. Commit and push `index.html`, `example/`, `benchmark/`, `playground/`, and `dist/`
+3. In repo Settings → Pages, choose "Deploy from a branch" and select your branch (root)
+
+Site will be live at `https://phantasm0009.github.io/accel-gpu/`
 
 ## License
 

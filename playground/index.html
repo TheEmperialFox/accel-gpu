@@ -37,9 +37,9 @@ const B = gpu.array(new Float32Array([1,2,3,4,5,6]), [3, 2]);
 const C = await matmul(gpu, A, B);
 console.log("matmul:", await C.toArray());
 
-// Method chaining
+// Method chaining (await each step — add/mul return Promises)
 const x = gpu.array([1, 2, 3, 4]);
-await x.add(1).mul(2);
+await (await x.add(1)).mul(2);
 console.log("chain:", await x.toArray());</textarea>
       <button id="run">Run</button>
     </div>

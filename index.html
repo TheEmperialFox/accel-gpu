@@ -3,29 +3,75 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>@accel/gpu - NumPy for the browser GPU</title>
+  <title>@accel/gpu — NumPy for the browser GPU</title>
   <style>
     * { box-sizing: border-box; }
-    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
-    h1 { color: #333; }
-    .nav { display: flex; gap: 1rem; margin: 2rem 0; flex-wrap: wrap; }
-    .nav a { padding: 0.5rem 1rem; background: #0066cc; color: white; text-decoration: none; border-radius: 6px; }
-    .nav a:hover { background: #0052a3; }
-    .nav a.secondary { background: #555; }
-    .nav a.secondary:hover { background: #333; }
-    p { color: #666; line-height: 1.6; }
+    body { font-family: system-ui, -apple-system, sans-serif; margin: 0; padding: 0; color: #24292f; line-height: 1.6; }
+    .wrap { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
+    h1 { font-size: 2rem; margin: 0 0 0.5rem; color: #0969da; }
+    .tagline { font-size: 1.1rem; color: #57606a; margin-bottom: 2rem; }
+    .nav { display: flex; gap: 0.75rem; margin-bottom: 2rem; flex-wrap: wrap; }
+    .nav a { padding: 0.5rem 1rem; background: #0969da; color: white; text-decoration: none; border-radius: 6px; font-weight: 500; }
+    .nav a:hover { background: #0550ae; }
+    .nav a.secondary { background: #656d76; }
+    .nav a.secondary:hover { background: #4c535b; }
+    h2 { font-size: 1.25rem; margin: 2rem 0 1rem; color: #1f2328; border-bottom: 1px solid #d0d7de; padding-bottom: 0.5rem; }
+    pre { background: #f6f8fa; padding: 1rem; border-radius: 6px; overflow-x: auto; font-size: 0.875rem; border: 1px solid #d0d7de; }
+    code { font-family: ui-monospace, monospace; }
+    p { color: #57606a; margin: 0 0 1rem; }
+    .links { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #d0d7de; }
+    .links a { color: #0969da; text-decoration: none; }
+    .links a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
-  <h1>@accel/gpu</h1>
-  <p><strong>NumPy for the browser GPU</strong> — zero shaders, zero dependencies.</p>
-  
-  <div class="nav">
-    <a href="/example/">Demo</a>
-    <a href="/benchmark/">Benchmarks</a>
-    <a href="/playground/">Playground</a>
-  </div>
+  <div class="wrap">
+    <h1>@accel/gpu</h1>
+    <p class="tagline">NumPy for the browser GPU — zero shaders, zero dependencies.</p>
 
-  <p>Lightweight WebGPU wrapper for data processing and math. No WGSL required.</p>
+    <div class="nav">
+      <a href="example/">Demo</a>
+      <a href="benchmark/">Benchmarks</a>
+      <a href="playground/">Playground</a>
+      <a href="https://github.com/Phantasm0009/accel-gpu" class="secondary" target="_blank" rel="noopener">GitHub</a>
+    </div>
+
+    <h2>Install</h2>
+    <pre><code>npm install @accel/gpu</code></pre>
+
+    <h2>Quick Start</h2>
+    <pre><code>import { init, matmul, softmax } from "@accel/gpu";
+
+const gpu = await init();
+const a = gpu.array([1, 2, 3, 4]);
+const b = gpu.array([5, 6, 7, 8]);
+await a.add(b);
+console.log(await a.toArray()); // [6, 8, 10, 12]</code></pre>
+
+    <h2>Shape Inference</h2>
+    <p>No need to pass M, N, K — inferred from array shapes.</p>
+    <pre><code>const A = gpu.array(new Float32Array([1,2,3,4,5,6]), [2, 3]);
+const B = gpu.array(new Float32Array([1,2,3,4,5,6]), [3, 2]);
+const C = await matmul(gpu, A, B);</code></pre>
+
+    <h2>Method Chaining</h2>
+    <p>Await each step — add/mul return Promises.</p>
+    <pre><code>const x = gpu.array([1, 2, 3, 4]);
+await (await x.add(1)).mul(2);
+console.log(await x.toArray());</code></pre>
+
+    <h2>ML Primitives</h2>
+    <pre><code>const probs = await softmax(gpu, logits);
+const normed = await layerNorm(gpu, x, gamma, beta);
+const scores = await attentionScores(gpu, Q, K);</code></pre>
+
+    <h2>Fallbacks</h2>
+    <p>Uses WebGPU when available, otherwise CPU. Works in Node, headless, and older browsers.</p>
+
+    <div class="links">
+      <a href="https://github.com/Phantasm0009/accel-gpu">Repository</a> ·
+      <a href="https://www.npmjs.com/package/@accel/gpu">npm</a>
+    </div>
+  </div>
 </body>
 </html>

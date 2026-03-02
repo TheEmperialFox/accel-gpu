@@ -29,8 +29,9 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/accel/gpu"
+    "url": "https://github.com/Phantasm0009/accel-gpu"
   },
+  "homepage": "https://phantasm0009.github.io/accel-gpu/",
   "license": "MIT",
   "sideEffects": false,
   "scripts": {
