@@ -14,6 +14,12 @@ export interface ArrowImportOptions {
   shape?: number[];
 }
 
+export interface BufferImportOptions {
+  shape?: number[];
+  byteOffset?: number;
+  length?: number;
+}
+
 /** Profiling entry for a single op */
 export interface ProfilingEntry {
   op: string;
@@ -61,8 +67,12 @@ export interface AccelContext {
   fromImageData(imageData: ImageData): GPUArray;
   /** Create a GPU-backed array from Apache Arrow-like column/vector data. */
   fromArrow(column: unknown, options?: ArrowImportOptions): GPUArray;
+  /** Create a GPU-backed array from ArrayBuffer/SharedArrayBuffer binary Float32 data. */
+  fromBuffer(buffer: ArrayBuffer | SharedArrayBuffer, options?: BufferImportOptions): GPUArray;
   /** Render a GPU array to an HTMLCanvasElement (width×height). */
   toCanvas(arr: GPUArray, width: number, height: number): Promise<HTMLCanvasElement>;
   /** Run work in a deterministic disposal scope. Arrays created inside are disposed on scope exit. */
   scoped<T>(fn: (ctx: AccelContext) => Promise<T> | T): Promise<T>;
+  /** Alias for scoped() inspired by TensorFlow.js tidy semantics. */
+  tidy<T>(fn: (ctx: AccelContext) => Promise<T> | T): Promise<T>;
 }

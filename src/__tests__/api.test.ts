@@ -16,6 +16,7 @@ import {
   gradients,
   sgdStep,
   fromArrow,
+  fromBuffer,
 } from "../../dist/index.js";
 
 describe("accel-gpu API", () => {
@@ -308,6 +309,17 @@ describe("accel-gpu API", () => {
     expect(leaked?.isDisposed).toBe(true);
   });
 
+  it("tidy disposal alias", async () => {
+    let leaked: import("../../dist/index.js").GPUArray | undefined;
+    const val = await gpu.tidy(async (ctx) => {
+      const a = ctx.array(new Float32Array([2, 4, 6]));
+      leaked = a;
+      return await a.mean();
+    });
+    expect(val).toBe(4);
+    expect(leaked?.isDisposed).toBe(true);
+  });
+
   it("gradients + sgdStep", async () => {
     const w = gpu.array(new Float32Array([1]));
     const x = 2;
@@ -354,6 +366,32 @@ describe("accel-gpu API", () => {
     const bData = await b.toArray();
     expect(bData[0]).toBe(5);
     expect(bData[2]).toBe(7);
+  });
+
+  it("raw buffer import helper + ctx.fromBuffer", async () => {
+    const backing = new ArrayBuffer(16);
+    const view = new Float32Array(backing);
+    view.set([1, 2, 3, 4]);
+
+    const a = fromBuffer(gpu, backing, { shape: [2, 2] });
+    const aData = await a.toArray();
+    expect(aData[0]).toBe(1);
+    expect(aData[3]).toBe(4);
+
+    const b = gpu.fromBuffer(backing, { byteOffset: 4, length: 3 });
+    const bData = await b.toArray();
+    expect(bData[0]).toBe(2);
+    expect(bData[2]).toBe(4);
+
+    if (typeof SharedArrayBuffer !== "undefined") {
+      const shared = new SharedArrayBuffer(8);
+      const sharedView = new Float32Array(shared);
+      sharedView.set([9, 10]);
+      const c = gpu.fromBuffer(shared);
+      const cData = await c.toArray();
+      expect(cData[0]).toBe(9);
+      expect(cData[1]).toBe(10);
+    }
   });
 
   it("norm, outer, mse, crossEntropy", async () => {

@@ -22,9 +22,10 @@ import type { WebGPUBackend } from "./backend/webgpu";
 import type { WebGLBackend } from "./backend/webgl-backend";
 import type { CPUBackend } from "./backend/cpu-backend";
 import { fromArrow as fromArrowOp } from "./ops/arrow";
+import { fromBuffer as fromBufferOp } from "./ops/buffer";
 
 export { GPUArray } from "./array";
-export type { AccelContext, ProfilingEntry, ArrowImportOptions } from "./types";
+export type { AccelContext, ProfilingEntry, ArrowImportOptions, BufferImportOptions } from "./types";
 
 /**
  * Options for initializing the Accel GPU context.
@@ -149,9 +150,11 @@ export async function init(options?: InitOptions): Promise<AccelContext> {
     },
     array(data: Float32Array | number[], shape?: number[]) {
       const arr = data instanceof Float32Array ? data : new Float32Array(data);
+      const contiguousView =
+        arr.byteOffset === 0 && arr.byteLength === arr.buffer.byteLength ? arr : arr.slice();
       const G = (globalThis as any).GPUBufferUsage;
       const usage = G.STORAGE | G.COPY_SRC | G.COPY_DST;
-      const buffer = backend.createBufferFromData(arr.buffer as ArrayBuffer, usage);
+      const buffer = backend.createBufferFromData(contiguousView.buffer as ArrayBuffer, usage);
       return trackArray(new GPUArray(backend, runner, buffer, arr.length, shape ?? [arr.length]));
     },
     zeros(shape: number[]) {
@@ -203,6 +206,12 @@ export async function init(options?: InitOptions): Promise<AccelContext> {
     fromArrow(column: unknown, options?: import("./types").ArrowImportOptions): GPUArray {
       return fromArrowOp(ctx, column, options);
     },
+    fromBuffer(
+      buffer: ArrayBuffer | SharedArrayBuffer,
+      options?: import("./types").BufferImportOptions
+    ): GPUArray {
+      return fromBufferOp(ctx, buffer, options);
+    },
     async toCanvas(arr: GPUArray, width: number, height: number): Promise<HTMLCanvasElement> {
       const canvas = document.createElement("canvas");
       canvas.width = width;
@@ -228,6 +237,9 @@ export async function init(options?: InitOptions): Promise<AccelContext> {
         }
       }
     },
+    async tidy<T>(fn: (ctx: AccelContext) => Promise<T> | T): Promise<T> {
+      return ctx.scoped(fn);
+    },
   };
 
   return ctx;
@@ -248,3 +260,5 @@ export { fft, ifft, fftMagnitude, spectrogram } from "./ops/fft";
 export { gradients, sgdStep } from "./ops/training";
 /** Data interoperability: Apache Arrow-like zero-copy import helpers. */
 export { fromArrow } from "./ops/arrow";
+/** Data interoperability: raw ArrayBuffer/SharedArrayBuffer import helper. */
+export { fromBuffer } from "./ops/buffer";

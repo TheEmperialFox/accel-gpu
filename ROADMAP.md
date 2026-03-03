@@ -67,6 +67,7 @@
 - WebAssembly CPU backend path via `init({ forceCPU: true, preferWasmCPU: true, wasmModule })` *(experimental)*
 - Web Worker CPU execution via `init({ forceCPU: true, worker: true })` *(experimental)*
 - Zero-copy Apache Arrow-like data import via `fromArrow(...)` and `gpu.fromArrow(...)`
+- Raw binary ingestion via `fromBuffer(...)` and `gpu.fromBuffer(...)` for `ArrayBuffer`/`SharedArrayBuffer`
 
 ### Optimization
 - Automatic scalar-chain fusion for `add/sub/mul/div` (affine fusion before materialization)
@@ -83,6 +84,18 @@
 ### Memory Management
 - `FinalizationRegistry` best-effort cleanup for leaked arrays
 - Scoped API: `gpu.scoped(fn)` deterministic disposal on scope exit
+- Tidy API: `gpu.tidy(fn)` alias for scoped memory cleanup
+
+### Packaging & Bundle Optimization
+- `sideEffects: false` for bundler tree-shaking
+- Subpath exports for targeted imports: `accel-gpu/math`, `accel-gpu/linalg`, `accel-gpu/ml`, `accel-gpu/signal`, `accel-gpu/data`
+
+### Quality & CI
+- Cross-browser Playwright checks on Chromium, Firefox, and WebKit
+
+### Documentation
+- Dedicated VitePress docs site with quick start and API pages
+- Embedded live playground and example iframes directly in docs pages
 
 ---
 

@@ -1,6 +1,6 @@
 {
   "name": "accel-gpu",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "description": "NumPy for the browser GPU — zero shaders, zero dependencies",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -11,6 +11,31 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./math": {
+      "types": "./dist/math.d.ts",
+      "import": "./dist/math.js",
+      "require": "./dist/math.cjs"
+    },
+    "./linalg": {
+      "types": "./dist/linalg.d.ts",
+      "import": "./dist/linalg.js",
+      "require": "./dist/linalg.cjs"
+    },
+    "./ml": {
+      "types": "./dist/ml.d.ts",
+      "import": "./dist/ml.js",
+      "require": "./dist/ml.cjs"
+    },
+    "./signal": {
+      "types": "./dist/signal.d.ts",
+      "import": "./dist/signal.js",
+      "require": "./dist/signal.cjs"
+    },
+    "./data": {
+      "types": "./dist/data.d.ts",
+      "import": "./dist/data.js",
+      "require": "./dist/data.cjs"
     }
   },
   "files": [
@@ -46,7 +71,11 @@
   "scripts": {
     "build": "tsup",
     "build:site": "npm run build && node scripts/build-site.js",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
     "test": "npm run build && vitest run",
+    "test:browsers": "playwright test",
     "test:watch": "npm run build && vitest",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
@@ -62,6 +91,8 @@
     "tsup": "^8.0.0",
     "typescript": "^5.3.0",
     "typescript-eslint": "^8.56.1",
-    "vitest": "^4.0.18"
+    "vitest": "^4.0.18",
+    "@playwright/test": "^1.54.2",
+    "vitepress": "^1.6.4"
   }
 }

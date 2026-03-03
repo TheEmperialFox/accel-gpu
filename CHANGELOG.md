@@ -4,6 +4,17 @@ All notable changes to accel-gpu will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.2.10] - 2026-03-03
+
+### Added
+
+- **Raw buffer interop** — `fromBuffer(...)` and `gpu.fromBuffer(...)` for direct `ArrayBuffer`/`SharedArrayBuffer` Float32 ingestion
+- **Docs site scaffold** — VitePress docs under `docs/` with quick start + API pages and embedded live iframes
+
+### Changed
+
+- **README slimmed down** — long-form API reference moved to docs site entry points
+
 ## [0.2.8] - 2026-03-03
 
 ### Added
@@ -19,6 +30,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Arrow interop** — Apache Arrow-like vector/column import via `fromArrow(...)` and `gpu.fromArrow(...)`
 - **Killer app demos** — `example/audio` (local audio spectrogram) and `example/vector-search` (browser-native vector search)
 - **Interactive docs playground** — embedded playground on landing page
+- **Tidy memory API** — `gpu.tidy(fn)` alias for scoped cleanup
+- **Subpath exports** — `accel-gpu/math`, `accel-gpu/linalg`, `accel-gpu/ml`, `accel-gpu/signal`, `accel-gpu/data`
+- **Cross-browser CI** — Playwright checks for Chromium, Firefox, and WebKit
 
 ### Changed
 

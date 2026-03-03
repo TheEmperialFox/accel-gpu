@@ -76,152 +76,21 @@ console.log(await probs.toArray());
 
 Run `npm run build` first, then `npx serve .` — visit `/`, `/example/`, `/example/image/`, etc.
 
-## API Reference
+## Documentation
 
-### Initialize
+- **Docs site (VitePress):** https://phantasm0009.github.io/accel-gpu/
+- **Quick Start:** https://phantasm0009.github.io/accel-gpu/guide/quickstart
+- **API Reference:** https://phantasm0009.github.io/accel-gpu/api
 
-```js
-const gpu = await init();
-const gpu = await init({ forceCPU: true });   // Force CPU for testing
-const gpu = await init({ forceWebGL: true }); // Force WebGL2
-const gpu = await init({ forceCPU: true, worker: true }); // CPU ops in Web Worker (experimental)
-const gpu = await init({ forceCPU: true, preferWasmCPU: true, wasmModule }); // WASM CPU path (experimental)
-```
+The full API reference, shape expectations, and runnable embedded playground/examples have moved to the docs site.
 
-Runtime flags:
+### Tree-shakable imports
 
 ```js
-console.log(gpu.backendType);    // 'webgpu' | 'webgl' | 'cpu'
-console.log(gpu.workerEnabled);  // true when worker CPU runner is active
-console.log(gpu.cpuEngine);      // 'js' | 'wasm' when CPU backend is used
-```
-
-Scoped lifecycle:
-
-```js
-await gpu.scoped(async (ctx) => {
-  const tmp = ctx.array([1, 2, 3]);
-  await tmp.mul(2);
-}); // arrays created in scope are disposed on exit
-```
-
-Arrow interoperability:
-
-```js
-// Apache Arrow-like vector/column
-const arr = gpu.fromArrow(arrowColumn, { shape: [rows, cols] });
-// or function form
-const arr2 = fromArrow(gpu, arrowVector);
-```
-
-### Create Arrays
-
-```js
-const arr = gpu.array([1, 2, 3]);
-const arr2 = gpu.array(new Float32Array([1, 2, 3]), [3]); // with shape
-const mat = gpu.array(data, [2, 3]); // 2×3 matrix
-const z = gpu.zeros([2, 3]);        // all zeros
-const o = gpu.ones([2, 3]);         // all ones
-const r = gpu.arange(0, 10, 2);     // [0, 2, 4, 6, 8]
-const l = gpu.linspace(0, 1, 100);  // 100 values from 0 to 1
-const rand = gpu.random([2, 3]);    // uniform [0, 1)
-const norm = gpu.randn([2, 3]);     // standard normal
-```
-
-### Math Operations (chainable)
-
-| Method                   | Description           |
-| ------------------------ | --------------------- |
-| `a.add(b)` or `a.add(5)` | Element-wise add      |
-| `a.sub(b)` or `a.sub(5)` | Element-wise subtract |
-| `a.mul(b)` or `a.mul(2)` | Element-wise multiply |
-| `a.div(b)` or `a.div(2)` | Element-wise divide   |
-| `a.pow(2)`               | Element-wise power    |
-| `a.sqrt()`, `a.abs()`, `a.neg()` | Unary ops     |
-| `a.exp()`, `a.log()`     | Element-wise exp/log  |
-| `a.sum()`, `a.max()`, `a.min()`, `a.mean()` | Reductions (pass `axis` for axis-specific) |
-| `a.variance()`, `a.std()`, `a.argmax()`, `a.argmin()` | Stats |
-| `a.dot(b)`               | Dot product → scalar  |
-| `a.reshape(2, 3)`        | Reshape (same length) |
-| `a.relu()`, `a.sigmoid()`, `a.tanh()`, `a.gelu()`, `a.leakyRelu(α)` | Activations |
-| `a.clamp(min, max)`      | Clamp values          |
-| `a.equal(b)`, `a.greater(b)`, `a.less(b)` | Comparison (returns 0/1 mask) |
-| `a.slice(start, end)`, `a.get(i)`, `a.set(i, v)` | Slicing |
-| `a.concat(b)`, `a.split(n)` | Concat/split |
-| `a.flatten()`, `a.squeeze()`, `a.unsqueeze(dim)` | Shape |
-| `a.broadcast(shape)`     | NumPy-style broadcast |
-| `a.norm(ord?)`, `a.outer(b)` | Norm, outer product |
-| `a.mse(target)`, `a.crossEntropy(target)` | Loss functions |
-| `a.normalize(axis?)`     | L2 normalize along axis |
-| `a.dispose()`, `a.isDisposed` | Memory management |
-| `a.toArraySync()`        | Sync read (CPU only)  |
-
-### Linear Algebra
-
-| Function                          | Description                       |
-| --------------------------------- | --------------------------------- |
-| `matmul(gpu, A, B)`               | Matrix multiply (shape inference) |
-| `dot(gpu, a, b)`                  | Vector dot product                |
-| `transpose(gpu, a, rows?, cols?)` | Transpose matrix                  |
-| `inv(gpu, a)`, `det(gpu, a)`      | Inverse, determinant              |
-| `solve(gpu, A, b)`                | Solve Ax = b                      |
-| `qr(gpu, a)`                      | QR decomposition                  |
-| `svd(gpu, a)`                     | Singular value decomposition      |
-
-`inv`, `qr`, and `svd` use iterative WebGPU paths when running on WebGPU backend, with CPU fallback.
-
-### ML Primitives
-
-| Function                                           | Description                 |
-| -------------------------------------------------- | --------------------------- |
-| `softmax(gpu, input, rows?, cols?)`                | Softmax over last dimension |
-| `layerNorm(gpu, input, gamma, beta, rows?, cols?)` | Layer normalization         |
-| `batchNorm(gpu, input, gamma, beta, rows?, cols?)` | Batch normalization         |
-| `attentionScores(gpu, Q, K, seq?, dim?)`           | Q @ K^T / sqrt(dim)         |
-| `maxPool2d(gpu, input, kernelSize, stride?, padding?)` | Max pooling 2D      |
-| `avgPool2d(gpu, input, kernelSize, stride?, padding?)` | Avg pooling 2D      |
-| `conv2d(gpu, input, kernel, stride?, padding?)`   | 2D convolution              |
-
-### FFT & Signal
-
-| Function | Description |
-| -------- | ----------- |
-| `fft(gpu, input)` | Forward FFT (power-of-2 length) |
-| `ifft(gpu, input)` | Inverse FFT |
-| `fftMagnitude(gpu, complex)` | Magnitude spectrum |
-| `spectrogram(gpu, input, frameLength, hopLength?, window?)` | STFT + magnitude |
-
-`fft`, `ifft`, and `fftMagnitude` use WebGPU kernels when running on WebGPU backend, with CPU/WebGL fallback.
-
-### Training Helpers
-
-| Function | Description |
-| -------- | ----------- |
-| `gradients(gpu, params, lossFn, epsilon?)` | Numerical gradients (central differences) |
-| `sgdStep(params, grads, learningRate)` | SGD update: `param -= lr * grad` |
-
-### Profiling
-
-```js
-const gpu = await init({ profiling: true });
-gpu.enableProfiling(true);
-// ... run ops ...
-gpu.recordOp("matmul", 12.5); // manual timing
-const results = gpu.getProfilingResults();
-```
-
-
-### Canvas Integration
-
-```js
-const img = gpu.fromImageData(imageData);
-const canvas = await gpu.toCanvas(arr, width, height);
-```
-
-### Read Back
-
-```js
-const data = await arr.toArray(); // Float32Array
+import { matmul, transpose } from "accel-gpu/linalg";
+import { softmax } from "accel-gpu/ml";
+import { fft } from "accel-gpu/signal";
+import { fromArrow, fromBuffer } from "accel-gpu/data";
 ```
 
 ## Fallback Chain
@@ -234,6 +103,10 @@ const data = await arr.toArray(); // Float32Array
 
 - `GET /.well-known/appspecific/com.chrome.devtools.json` returning `404` in local server logs is a Chrome DevTools probe and is harmless.
 - `304` responses for files like `dist/index.js` and source maps are normal cache revalidation, not runtime failures.
+
+## Cross-Browser Validation
+
+- Playwright browser tests run across Chromium, Firefox, and WebKit in CI to validate fallback behavior.
 
 ## Contributing
 
