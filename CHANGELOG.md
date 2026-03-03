@@ -4,6 +4,19 @@ All notable changes to accel-gpu will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.2.11] - 2026-03-03
+
+### Added
+
+- **TypeScript shape safety (opt-in)** — generic `GPUArray<Shape>` plus shape-aware overloads for `matmul`, `dot`, and `transpose`
+- **Docs theming** — custom VitePress theme styling and cleaner home/guide/reference presentation
+
+### Changed
+
+- **GitHub Pages docs routing fix** — `build:site` now includes VitePress build output so `/guide/quickstart` resolves correctly
+- **Docs UX refresh** — improved navigation, sidebar grouping, search, footer, and page structure
+- **`tidy()` semantics hardened** — preserves returned arrays, disposes intermediates, and supports nested tidy scope retention
+
 ## [0.2.10] - 2026-03-03
 
 ### Added

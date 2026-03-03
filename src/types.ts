@@ -10,12 +10,16 @@ import type { WebGLRunner } from "./backend/webgl-runner";
 import type { CPURunner } from "./backend/cpu-runner";
 import type { GPUArray } from "./array";
 
-export interface ArrowImportOptions {
-  shape?: number[];
+export type Shape = number[];
+export type VectorShape<N extends number = number> = [N];
+export type MatrixShape<R extends number = number, C extends number = number> = [R, C];
+
+export interface ArrowImportOptions<S extends Shape = Shape> {
+  shape?: S;
 }
 
-export interface BufferImportOptions {
-  shape?: number[];
+export interface BufferImportOptions<S extends Shape = Shape> {
+  shape?: S;
   byteOffset?: number;
   length?: number;
 }
@@ -48,13 +52,13 @@ export interface AccelContext {
   /** Get profiling results (op name, duration ms). */
   getProfilingResults(): ProfilingEntry[];
   /** Create a GPU-backed array from data. Optionally specify shape (e.g. [2, 3] for 2×3). */
-  array(data: Float32Array | number[], shape?: number[]): GPUArray;
+  array<S extends Shape = Shape>(data: Float32Array | number[], shape?: S): GPUArray<S>;
   /** Create array of zeros. */
-  zeros(shape: number[]): GPUArray;
+  zeros<S extends Shape = Shape>(shape: S): GPUArray<S>;
   /** Create array of ones. */
-  ones(shape: number[]): GPUArray;
+  ones<S extends Shape = Shape>(shape: S): GPUArray<S>;
   /** Create array filled with value. */
-  full(shape: number[], value: number): GPUArray;
+  full<S extends Shape = Shape>(shape: S, value: number): GPUArray<S>;
   /** Create array [start, start+step, ...] up to (not including) stop. */
   arange(start: number, stop: number, step?: number): GPUArray;
   /** Create array of num linearly spaced values from start to stop. */
@@ -66,9 +70,12 @@ export interface AccelContext {
   /** Create a GPU-backed array from ImageData (RGBA, normalized to [0,1]). */
   fromImageData(imageData: ImageData): GPUArray;
   /** Create a GPU-backed array from Apache Arrow-like column/vector data. */
-  fromArrow(column: unknown, options?: ArrowImportOptions): GPUArray;
+  fromArrow<S extends Shape = Shape>(column: unknown, options?: ArrowImportOptions<S>): GPUArray<S>;
   /** Create a GPU-backed array from ArrayBuffer/SharedArrayBuffer binary Float32 data. */
-  fromBuffer(buffer: ArrayBuffer | SharedArrayBuffer, options?: BufferImportOptions): GPUArray;
+  fromBuffer<S extends Shape = Shape>(
+    buffer: ArrayBuffer | SharedArrayBuffer,
+    options?: BufferImportOptions<S>
+  ): GPUArray<S>;
   /** Render a GPU array to an HTMLCanvasElement (width×height). */
   toCanvas(arr: GPUArray, width: number, height: number): Promise<HTMLCanvasElement>;
   /** Run work in a deterministic disposal scope. Arrays created inside are disposed on scope exit. */

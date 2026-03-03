@@ -9,8 +9,9 @@ export default defineConfig({
     nav: [
       { text: "Quick Start", link: "/guide/quickstart" },
       { text: "API", link: "/api" },
-      { text: "Examples", link: "https://phantasm0009.github.io/accel-gpu/example/" },
-      { text: "Playground", link: "https://phantasm0009.github.io/accel-gpu/playground/" },
+      { text: "Demos", link: "/demos" },
+      { text: "Playground", link: "/playground" },
+      { text: "Benchmarks", link: "/benchmarks" },
     ],
     sidebar: [
       {
@@ -18,12 +19,28 @@ export default defineConfig({
         items: [
           { text: "Overview", link: "/" },
           { text: "Quick Start", link: "/guide/quickstart" },
+          { text: "Memory Management", link: "/guide/memory-management" },
         ],
       },
       {
         text: "Reference",
         items: [
           { text: "API Reference", link: "/api" },
+        ],
+      },
+      {
+        text: "Explore",
+        items: [
+          { text: "Demos Hub", link: "/demos" },
+          { text: "Demo: Core", link: "/demos/core" },
+          { text: "Demo: Image", link: "/demos/image" },
+          { text: "Demo: Heatmap", link: "/demos/heatmap" },
+          { text: "Demo: NN", link: "/demos/nn" },
+          { text: "Demo: N-Body", link: "/demos/nbody" },
+          { text: "Demo: Audio", link: "/demos/audio" },
+          { text: "Demo: Vector Search", link: "/demos/vector-search" },
+          { text: "Playground", link: "/playground" },
+          { text: "Benchmarks", link: "/benchmarks" },
         ],
       },
     ],

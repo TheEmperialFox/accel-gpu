@@ -3,7 +3,7 @@
  */
 
 import type { GPUArray } from "../array";
-import type { AccelContext } from "../types";
+import type { AccelContext, MatrixShape, VectorShape } from "../types";
 import { errMatmulShapes } from "../errors";
 
 /** Infer M, N, K from shapes. A is M×K, B is K×N, result is M×N. */
@@ -87,6 +87,30 @@ function inferMatmulShapes(a: GPUArray, b: GPUArray): { M: number; N: number; K:
  * @param K - Optional explicit inner dimension
  * @returns Promise resolving to the result matrix (M×N)
  */
+export async function matmul<M extends number, K extends number, N extends number>(
+  ctx: AccelContext,
+  a: GPUArray<MatrixShape<M, K>>,
+  b: GPUArray<MatrixShape<K, N>>,
+  M?: number,
+  N?: number,
+  K?: number
+): Promise<GPUArray<MatrixShape<M, N>>>;
+export async function matmul<N extends number>(
+  ctx: AccelContext,
+  a: GPUArray<VectorShape<N>>,
+  b: GPUArray<VectorShape<N>>,
+  M?: number,
+  N?: number,
+  K?: number
+): Promise<GPUArray<[1]>>;
+export async function matmul(
+  ctx: AccelContext,
+  a: GPUArray,
+  b: GPUArray,
+  M?: number,
+  N?: number,
+  K?: number
+): Promise<GPUArray>;
 export async function matmul(
   ctx: AccelContext,
   a: GPUArray,
@@ -131,6 +155,12 @@ export async function matmul(
   );
 }
 
+export async function dot<N extends number>(
+  ctx: AccelContext,
+  a: GPUArray<VectorShape<N>>,
+  b: GPUArray<VectorShape<N>>
+): Promise<number>;
+export async function dot(ctx: AccelContext, a: GPUArray, b: GPUArray): Promise<number>;
 export async function dot(ctx: AccelContext, a: GPUArray, b: GPUArray): Promise<number> {
   return a.dot(b);
 }
@@ -143,6 +173,18 @@ export async function dot(ctx: AccelContext, a: GPUArray, b: GPUArray): Promise<
  * @param cols - Optional explicit cols
  * @returns Promise resolving to transposed matrix (cols×rows)
  */
+export async function transpose<R extends number, C extends number>(
+  ctx: AccelContext,
+  a: GPUArray<MatrixShape<R, C>>,
+  rows?: number,
+  cols?: number
+): Promise<GPUArray<MatrixShape<C, R>>>;
+export async function transpose(
+  ctx: AccelContext,
+  a: GPUArray,
+  rows?: number,
+  cols?: number
+): Promise<GPUArray>;
 export async function transpose(
   ctx: AccelContext,
   a: GPUArray,

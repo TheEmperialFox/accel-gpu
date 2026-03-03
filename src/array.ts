@@ -30,7 +30,7 @@ function isWebGL(backend: Backend): backend is WebGLBackend {
  * Supports element-wise ops (add, mul), reductions (sum, max), dot product,
  * and reshape. Data lives on the selected backend (WebGPU, WebGL2, or CPU).
  */
-export class GPUArray {
+export class GPUArray<S extends number[] = number[]> {
   private static finalizer =
     typeof (globalThis as any).FinalizationRegistry !== "undefined"
       ? new (globalThis as any).FinalizationRegistry((cleanup: () => void) => {
@@ -83,8 +83,8 @@ export class GPUArray {
   }
 
   /** Current shape of the array (e.g. [2, 3] for a 2×3 matrix). */
-  get shape(): number[] {
-    return [...this._shape];
+  get shape(): S {
+    return [...this._shape] as S;
   }
 
   private _enqueueAffine(scaleMul: number, biasAdd: number): void {
@@ -166,7 +166,7 @@ export class GPUArray {
    * @param dims - New dimensions (e.g. 2, 3 for a 2×3 matrix)
    * @returns this for chaining
    */
-  reshape(...dims: number[]): GPUArray {
+  reshape<D extends number[]>(...dims: D): GPUArray<D> {
     const total = dims.reduce((a, b) => a * b, 1);
     if (total !== this.length) {
       throw new Error(
@@ -174,7 +174,7 @@ export class GPUArray {
       );
     }
     this._shape = dims;
-    return this;
+    return this as unknown as GPUArray<D>;
   }
 
   /**

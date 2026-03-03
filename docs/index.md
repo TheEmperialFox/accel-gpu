@@ -10,11 +10,11 @@ hero:
       text: Quick Start
       link: /guide/quickstart
     - theme: alt
-      text: API Reference
-      link: /api
+      text: Explore Demos
+      link: /demos
     - theme: alt
       text: Open Playground
-      link: https://phantasm0009.github.io/accel-gpu/playground/
+      link: /playground
 
 features:
   - title: Zero-shader API
@@ -37,10 +37,10 @@ features:
 
 ## Examples
 
-- [Demo](https://phantasm0009.github.io/accel-gpu/example/)
-- [Image Processing](https://phantasm0009.github.io/accel-gpu/example/image/)
-- [Heatmap](https://phantasm0009.github.io/accel-gpu/example/heatmap/)
-- [Neural Network](https://phantasm0009.github.io/accel-gpu/example/nn/)
-- [N-Body](https://phantasm0009.github.io/accel-gpu/example/nbody/)
-- [Local Audio Transcriber](https://phantasm0009.github.io/accel-gpu/example/audio/)
-- [Vector Search (RAG)](https://phantasm0009.github.io/accel-gpu/example/vector-search/)
+- [Demos Hub](/demos)
+- [Image Processing Demo](/demos/image)
+- [Heatmap Demo](/demos/heatmap)
+- [Neural Network Demo](/demos/nn)
+- [N-Body Demo](/demos/nbody)
+- [Local Audio Demo](/demos/audio)
+- [Vector Search Demo](/demos/vector-search)

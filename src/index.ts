@@ -124,11 +124,33 @@ export async function init(options?: InitOptions): Promise<AccelContext> {
   let profilingEnabled = options?.profiling ?? false;
   const scopeStack: Set<GPUArray>[] = [];
 
-  function trackArray(arr: GPUArray): GPUArray {
+  function trackArray<S extends number[]>(arr: GPUArray<S>): GPUArray<S> {
     if (scopeStack.length > 0) {
       scopeStack[scopeStack.length - 1].add(arr);
     }
     return arr;
+  }
+
+  function collectReturnedArrays(value: unknown, arrays: Set<GPUArray>, seen = new Set<unknown>()): void {
+    if (value === null || value === undefined) return;
+    if (seen.has(value)) return;
+    seen.add(value);
+
+    if (value instanceof GPUArray) {
+      arrays.add(value);
+      return;
+    }
+
+    if (Array.isArray(value)) {
+      for (const item of value) collectReturnedArrays(item, arrays, seen);
+      return;
+    }
+
+    if (typeof value === "object") {
+      for (const item of Object.values(value as Record<string, unknown>)) {
+        collectReturnedArrays(item, arrays, seen);
+      }
+    }
   }
 
   const ctx: AccelContext = {
@@ -148,24 +170,26 @@ export async function init(options?: InitOptions): Promise<AccelContext> {
     getProfilingResults() {
       return [...profilingEntries];
     },
-    array(data: Float32Array | number[], shape?: number[]) {
+    array<S extends number[] = number[]>(data: Float32Array | number[], shape?: S): GPUArray<S> {
       const arr = data instanceof Float32Array ? data : new Float32Array(data);
       const contiguousView =
         arr.byteOffset === 0 && arr.byteLength === arr.buffer.byteLength ? arr : arr.slice();
       const G = (globalThis as any).GPUBufferUsage;
       const usage = G.STORAGE | G.COPY_SRC | G.COPY_DST;
       const buffer = backend.createBufferFromData(contiguousView.buffer as ArrayBuffer, usage);
-      return trackArray(new GPUArray(backend, runner, buffer, arr.length, shape ?? [arr.length]));
+      return trackArray(
+        new GPUArray(backend, runner, buffer, arr.length, (shape ?? [arr.length]) as number[])
+      ) as GPUArray<S>;
     },
-    zeros(shape: number[]) {
+    zeros<S extends number[] = number[]>(shape: S): GPUArray<S> {
       const size = shape.reduce((a, b) => a * b, 1);
       return ctx.array(new Float32Array(size).fill(0), shape);
     },
-    ones(shape: number[]) {
+    ones<S extends number[] = number[]>(shape: S): GPUArray<S> {
       const size = shape.reduce((a, b) => a * b, 1);
       return ctx.array(new Float32Array(size).fill(1), shape);
     },
-    full(shape: number[], value: number) {
+    full<S extends number[] = number[]>(shape: S, value: number): GPUArray<S> {
       const size = shape.reduce((a, b) => a * b, 1);
       return ctx.array(new Float32Array(size).fill(value), shape);
     },
@@ -203,14 +227,17 @@ export async function init(options?: InitOptions): Promise<AccelContext> {
       for (let i = 0; i < data.length; i++) floats[i] = data[i] / 255;
       return ctx.array(floats, [height, width, 4]);
     },
-    fromArrow(column: unknown, options?: import("./types").ArrowImportOptions): GPUArray {
-      return fromArrowOp(ctx, column, options);
+    fromArrow<S extends number[] = number[]>(
+      column: unknown,
+      options?: import("./types").ArrowImportOptions<S>
+    ): GPUArray<S> {
+      return fromArrowOp(ctx, column, options) as GPUArray<S>;
     },
-    fromBuffer(
+    fromBuffer<S extends number[] = number[]>(
       buffer: ArrayBuffer | SharedArrayBuffer,
-      options?: import("./types").BufferImportOptions
-    ): GPUArray {
-      return fromBufferOp(ctx, buffer, options);
+      options?: import("./types").BufferImportOptions<S>
+    ): GPUArray<S> {
+      return fromBufferOp(ctx, buffer, options) as GPUArray<S>;
     },
     async toCanvas(arr: GPUArray, width: number, height: number): Promise<HTMLCanvasElement> {
       const canvas = document.createElement("canvas");
@@ -238,7 +265,35 @@ export async function init(options?: InitOptions): Promise<AccelContext> {
       }
     },
     async tidy<T>(fn: (ctx: AccelContext) => Promise<T> | T): Promise<T> {
-      return ctx.scoped(fn);
+      const scope = new Set<GPUArray>();
+      scopeStack.push(scope);
+      let hasResult = false;
+      let result!: T;
+
+      try {
+        result = await fn(ctx);
+        hasResult = true;
+        return result;
+      } finally {
+        scopeStack.pop();
+
+        const survivors = new Set<GPUArray>();
+        if (hasResult) {
+          collectReturnedArrays(result, survivors);
+        }
+
+        if (scopeStack.length > 0) {
+          const parentScope = scopeStack[scopeStack.length - 1];
+          for (const arr of survivors) {
+            parentScope.add(arr);
+          }
+        }
+
+        for (const arr of scope) {
+          if (survivors.has(arr)) continue;
+          if (!arr.isDisposed) arr.dispose();
+        }
+      }
     },
   };
 
