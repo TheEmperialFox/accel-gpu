@@ -467,6 +467,7 @@ export class WebGLRunner {
       gl.uniform1i(gl.getUniformLocation(p, "u_b"), 1);
       gl.uniform2f(gl.getUniformLocation(p, "u_texSizeA"), a.width, a.height);
       gl.uniform2f(gl.getUniformLocation(p, "u_texSizeB"), b.width, b.height);
+      gl.uniform2f(gl.getUniformLocation(p, "u_texSizeOut"), out.width, out.height);
       gl.uniform3f(gl.getUniformLocation(p, "u_params"), M, N, K);
       this.renderQuad();
     });

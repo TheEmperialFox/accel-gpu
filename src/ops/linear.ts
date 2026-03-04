@@ -4,7 +4,7 @@
 
 import type { GPUArray } from "../array";
 import type { AccelContext, MatrixShape, VectorShape } from "../types";
-import { errMatmulShapes } from "../errors";
+import { errLengthMismatch, errMatmulShapes, errRequires2DOrExplicit } from "../errors";
 
 /** Infer M, N, K from shapes. A is M×K, B is K×N, result is M×N. */
 function inferMatmulShapes(a: GPUArray, b: GPUArray): { M: number; N: number; K: number } {
@@ -123,8 +123,11 @@ export async function matmul(
   if (M !== undefined && N !== undefined && K !== undefined) {
     dims = { M, N, K };
     if (a.length !== M * K || b.length !== K * N) {
-      throw new Error(
-        `matmul: shape mismatch — A should be ${M}×${K} (${M * K} elements), got ${a.length}. B should be ${K}×${N} (${K * N} elements), got ${b.length}.`
+      errMatmulShapes(
+        "matmul",
+        `${M}×${K} (${M * K} elements)`,
+        `${K}×${N} (${K * N} elements)`,
+        `received lengths A=${a.length}, B=${b.length}.`
       );
     }
   } else {
@@ -198,11 +201,11 @@ export async function transpose(
   } else if (a.shape.length === 2) {
     [r, c] = a.shape;
   } else {
-    throw new Error("transpose: provide rows and cols, or use a 2D array with shape.");
+    errRequires2DOrExplicit("transpose");
   }
 
   if (a.length !== r * c) {
-    throw new Error(`transpose: shape mismatch — expected ${r * c} elements, got ${a.length}.`);
+    errLengthMismatch("transpose", r * c, a.length);
   }
 
   const data = await a.toArray();

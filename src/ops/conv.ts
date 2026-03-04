@@ -5,6 +5,7 @@
 import type { GPUArray } from "../array";
 import type { AccelContext } from "../types";
 import type { KernelRunner } from "../backend/kernel-runner";
+import { errMatmulShapes, errRequiresRank } from "../errors";
 
 function get4DShape(
   input: GPUArray,
@@ -18,7 +19,7 @@ function get4DShape(
   const s = input.shape;
   if (s.length === 4) return { n: s[0], h: s[1], w: s[2], c: s[3] };
   if (s.length === 3) return { n: 1, h: s[0], w: s[1], c: s[2] };
-  throw new Error("conv/pool: need 3D [H,W,C] or 4D [N,H,W,C] shape");
+  errRequiresRank("conv/pool", "rank-3 [H,W,C] or rank-4 [N,H,W,C]", s.length);
 }
 
 /**
@@ -196,9 +197,16 @@ export async function conv2d(
 ): Promise<GPUArray> {
   const { n, h: H, w: W, c: C_in } = get4DShape(input, h, w, cIn);
   const kShape = kernel.shape;
-  if (kShape.length !== 4) throw new Error("conv2d: kernel must be 4D [kH,kW,C_in,C_out]");
+  if (kShape.length !== 4) errRequiresRank("conv2d kernel", "rank-4 [kH,kW,C_in,C_out]", kShape.length);
   const [kH, kW, kCIn, C_out] = kShape;
-  if (kCIn !== C_in) throw new Error(`conv2d: kernel C_in ${kCIn} != input C ${C_in}`);
+  if (kCIn !== C_in) {
+    errMatmulShapes(
+      "conv2d",
+      `[kH=${kH}, kW=${kW}, C_in=${kCIn}, C_out=${C_out}]`,
+      `[N=${n}, H=${H}, W=${W}, C=${C_in}]`,
+      `input channels must match kernel channels (${C_in} vs ${kCIn}).`
+    );
+  }
 
   const outH = Math.floor((H + 2 * padding - kH) / stride) + 1;
   const outW = Math.floor((W + 2 * padding - kW) / stride) + 1;

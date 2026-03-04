@@ -20,6 +20,7 @@ export default defineConfig({
           { text: "Overview", link: "/" },
           { text: "Quick Start", link: "/guide/quickstart" },
           { text: "Memory Management", link: "/guide/memory-management" },
+          { text: "Backend Tolerance", link: "/guide/backend-tolerance" },
         ],
       },
       {

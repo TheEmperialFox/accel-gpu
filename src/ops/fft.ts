@@ -6,11 +6,12 @@
 import type { GPUArray } from "../array";
 import type { AccelContext } from "../types";
 import type { KernelRunner } from "../backend/kernel-runner";
+import { errEvenLength, errPowerOfTwo } from "../errors";
 
 /** In-place Cooley-Tukey FFT. Input: interleaved real/imag, length must be power of 2. */
 function fft1dCPU(data: Float32Array, inverse = false): void {
   const n = data.length / 2;
-  if ((n & (n - 1)) !== 0) throw new Error(`fft: length must be power of 2, got ${n}`);
+  if ((n & (n - 1)) !== 0) errPowerOfTwo("fft", "length", n);
 
   // Bit-reversal permutation
   const bits = Math.log2(n);
@@ -70,7 +71,7 @@ export async function fft(
 ): Promise<GPUArray> {
   const n = input.length;
   if ((n & (n - 1)) !== 0) {
-    throw new Error(`fft: length must be power of 2, got ${n}`);
+    errPowerOfTwo("fft", "length", n);
   }
   if (ctx.backendType === "webgpu") {
     await input.materialize();
@@ -111,7 +112,7 @@ export async function fft(
  */
 export async function ifft(ctx: AccelContext, input: GPUArray): Promise<GPUArray> {
   if (input.length % 2 !== 0) {
-    throw new Error(`ifft: input length must be even (2*N complex), got ${input.length}`);
+    errEvenLength("ifft", input.length, "expected even length for interleaved complex data (2*N)");
   }
   if (ctx.backendType === "webgpu") {
     await input.materialize();
@@ -199,7 +200,7 @@ export async function spectrogram(
   const n = input.length;
   const hop = hopLength ?? Math.floor(frameLength / 2);
   if ((frameLength & (frameLength - 1)) !== 0) {
-    throw new Error(`spectrogram: frameLength must be power of 2, got ${frameLength}`);
+    errPowerOfTwo("spectrogram", "frameLength", frameLength);
   }
 
   const numFrames = Math.floor((n - frameLength) / hop) + 1;

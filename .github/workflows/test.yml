@@ -24,3 +24,7 @@ jobs:
       - run: npm ci
 
       - run: npm test
+
+      - name: Bundle size check
+        if: matrix.node-version == '20'
+        run: npm run test:bundle-size

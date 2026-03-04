@@ -4,6 +4,25 @@ All notable changes to accel-gpu will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.0.1] - 2026-03-04
+
+### Added
+
+- **Backend consistency tests** — CPU/auto/WASM checks for `matmul`, `inv`, `fft`, and `conv2d`
+- **Memory stress tests** — repeated and nested `tidy`/`scoped` lifecycle validation
+- **Error canonicalization tests** — standardized validation message assertions
+- **Bundle-size guard** — `test:bundle-size` script with CI enforcement
+- **Backend tolerance docs** — new guide for cross-backend drift expectations and debugging
+
+### Fixed
+
+- **WebGL matmul indexing bug** — output coordinate mapping now uses output texture dimensions, fixing large numeric drift vs CPU
+
+### Changed
+
+- **Error message standardization** — unified shape/rank/power-of-two/even-length validation text across linear, matrix, conv, and FFT ops
+- **Browser consistency checks** — strict matmul consistency restored after WebGL fix
+
 ## [1.0.0] - 2026-03-04
 
 ### Added

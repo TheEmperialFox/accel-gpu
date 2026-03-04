@@ -1,6 +1,6 @@
 {
   "name": "accel-gpu",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "NumPy for the browser GPU — zero shaders, zero dependencies",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -75,6 +75,7 @@
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
     "test": "npm run build && vitest run",
+    "test:bundle-size": "npm run build && node scripts/check-bundle-size.mjs",
     "test:browsers": "playwright test",
     "test:watch": "npm run build && vitest",
     "lint": "eslint src",

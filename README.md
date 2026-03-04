@@ -108,6 +108,12 @@ import { fromArrow, fromBuffer } from "accel-gpu/data";
 
 - Playwright browser tests run across Chromium, Firefox, and WebKit in CI to validate fallback behavior.
 
+## Backend Tolerance & Debugging
+
+- Results are validated across backend selections using numeric tolerances (typically `1e-4` to `2e-4`).
+- For debugging or deterministic comparisons, use `init({ forceCPU: true })` and compare against `init()` output.
+- Full guidance: https://phantasm0009.github.io/accel-gpu/guide/backend-tolerance
+
 ## Contributing
 
 Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, architecture, and guidelines. Quick start: clone, `npm install`, `npm test`, then open a PR. We adhere to the [Contributor Covenant](CODE_OF_CONDUCT.md) code of conduct.

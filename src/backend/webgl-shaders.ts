@@ -373,13 +373,14 @@ uniform sampler2D u_a;
 uniform sampler2D u_b;
 uniform vec2 u_texSizeA;
 uniform vec2 u_texSizeB;
+uniform vec2 u_texSizeOut;
 uniform vec3 u_params;
 out vec4 fragColor;
 void main() {
   float M = u_params.x;
   float N = u_params.y;
   float K = u_params.z;
-  float i = floor(gl_FragCoord.y) * u_texSizeB.x + floor(gl_FragCoord.x);
+  float i = floor(gl_FragCoord.y) * u_texSizeOut.x + floor(gl_FragCoord.x);
   int row = int(floor(i / N));
   int col = int(mod(i, N));
   if (row >= int(M) || col >= int(N)) {

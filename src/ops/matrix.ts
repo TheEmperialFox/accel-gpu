@@ -6,6 +6,7 @@
 import type { GPUArray } from "../array";
 import type { AccelContext } from "../types";
 import { matmul, transpose } from "./linear";
+import { errLengthMismatch, errRequires2DOrExplicit, errRequiresSquare } from "../errors";
 
 function copyTo2D(arr: Float32Array, rows: number, cols: number): number[][] {
   const m: number[][] = [];
@@ -257,9 +258,9 @@ export async function inv(
   } else if (a.shape.length === 2) {
     [r, c] = a.shape;
   } else {
-    throw new Error("inv: provide rows and cols, or use 2D array");
+    errRequires2DOrExplicit("inv");
   }
-  if (r !== c) throw new Error(`inv: matrix must be square, got ${r}×${c}`);
+  if (r !== c) errRequiresSquare("inv", r, c);
 
   if (ctx.backendType === "webgpu") {
     return invWebGPU(ctx, a, r);
@@ -292,9 +293,9 @@ export async function det(
   } else if (a.shape.length === 2) {
     [r, c] = a.shape;
   } else {
-    throw new Error("det: provide rows and cols, or use 2D array");
+    errRequires2DOrExplicit("det");
   }
-  if (r !== c) throw new Error(`det: matrix must be square, got ${r}×${c}`);
+  if (r !== c) errRequiresSquare("det", r, c);
   const data = await a.toArray();
   const m = copyTo2D(data, r, c);
   const { U } = luDecompose(m);
@@ -316,9 +317,9 @@ export async function solve(
   } else if (A.shape.length === 2) {
     n = A.shape[0];
   } else {
-    throw new Error("solve: provide rows or use 2D A");
+    throw new Error("solve: provide rows, or use a 2D A matrix shape.");
   }
-  if (b.length !== n) throw new Error(`solve: b must have length ${n}`);
+  if (b.length !== n) errLengthMismatch("solve", n, b.length);
   const aData = await A.toArray();
   const bData = await b.toArray();
   const m = copyTo2D(aData, n, n);
@@ -351,7 +352,7 @@ export async function qr(
   } else if (a.shape.length === 2) {
     [m, n] = a.shape;
   } else {
-    throw new Error("qr: provide rows and cols, or use 2D array");
+    errRequires2DOrExplicit("qr");
   }
   if (ctx.backendType === "webgpu") {
     return qrWebGPU(ctx, a, m, n);
@@ -419,7 +420,7 @@ export async function svd(
   } else if (a.shape.length === 2) {
     [m, n] = a.shape;
   } else {
-    throw new Error("svd: provide rows and cols, or use 2D array");
+    errRequires2DOrExplicit("svd");
   }
   if (ctx.backendType === "webgpu") {
     return svdWebGPU(ctx, a, m, n);

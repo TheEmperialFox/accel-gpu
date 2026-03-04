@@ -1,6 +1,6 @@
 # accel-gpu Roadmap
 
-## Implemented (v0.3.0+)
+## Implemented (through v1.0.0)
 
 ### Basic Math
 - `add`, `sub`, `mul`, `div` — element-wise (array or scalar)
@@ -99,6 +99,36 @@
 
 ---
 
-## Planned
+## Post-1.0 Hardening (Implemented)
 
-- No active roadmap items at the moment.
+### 1) Backend Consistency Test Matrix
+- Added cross-backend numeric consistency tests for `matmul`, `inv`, `fft`, and `conv2d`
+- Added tolerance gates with default epsilon and op-specific overrides
+- Added drift reporting (max absolute / relative error per op) in browser consistency test output
+
+### 2) Memory Safety Stress Validation
+- Added long-run stress loops for `gpu.tidy(...)` and `gpu.scoped(...)` repeated allocations
+- Added nested-scope disposal and survivor assertions
+- Added backend tolerance/debug guide notes including memory management guidance
+
+### 3) Error Message Standardization
+- Standardized shape/rank/power-of-two/even-length validation messages via shared helpers
+- Audited `matmul`, `solve`, `conv2d`, `fft`/`ifft`/`spectrogram`, and transpose validation paths
+- Added canonical error assertion tests covering core validation paths
+
+### 4) Docs & Demo UX Consistency
+- Kept docs-first themed navigation as canonical entrypoint (`/`)
+- Added backend selection/performance/debug guidance in docs
+- Added numeric tolerance guidance for cross-backend comparisons
+
+### 5) Packaging/Bundle Verification
+- Added bundle-size smoke checks for `math`, `linalg`, `ml`, `signal`, `data`, and main entrypoints
+- Wired bundle verification into CI to catch size regressions
+
+## Status Notes (Gemini Review Alignment)
+
+- Safety layer (`tidy`/`scoped` + `FinalizationRegistry`): implemented
+- Subpath exports and tree-shaking setup: implemented
+- Interactive docs site (VitePress + live embeds): implemented
+- Cross-backend consistency runner with epsilon metrics and drift reporting: implemented
+- Error-message standardization audit and validation tests: implemented
