@@ -377,25 +377,38 @@ uniform vec2 u_texSizeOut;
 uniform vec3 u_params;
 out vec4 fragColor;
 void main() {
-  float M = u_params.x;
-  float N = u_params.y;
-  float K = u_params.z;
-  float i = floor(gl_FragCoord.y) * u_texSizeOut.x + floor(gl_FragCoord.x);
-  int row = int(floor(i / N));
-  int col = int(mod(i, N));
-  if (row >= int(M) || col >= int(N)) {
+  int M = int(u_params.x + 0.5);
+  int N = int(u_params.y + 0.5);
+  int K = int(u_params.z + 0.5);
+
+  int outX = int(floor(gl_FragCoord.x));
+  int outY = int(floor(gl_FragCoord.y));
+  int outW = int(u_texSizeOut.x + 0.5);
+  int outIdx = outY * outW + outX;
+
+  if (outIdx >= M * N) {
     fragColor = packFloat(0.0);
     return;
   }
+
+  int row = outIdx / N;
+  int col = outIdx - row * N;
+
   float sum = 0.0;
   for (int k = 0; k < 1024; k++) {
-    if (float(k) >= K) break;
-    float aIdx = float(row) * K + float(k);
-    float bIdx = float(k) * N + float(col);
-    int ax = int(mod(aIdx, u_texSizeA.x));
-    int ay = int(floor(aIdx / u_texSizeA.x));
-    int bx = int(mod(bIdx, u_texSizeB.x));
-    int by = int(floor(bIdx / u_texSizeB.x));
+    if (k >= K) break;
+
+    int aIdx = row * K + k;
+    int bIdx = k * N + col;
+
+    int aW = int(u_texSizeA.x + 0.5);
+    int bW = int(u_texSizeB.x + 0.5);
+
+    int ax = aIdx - (aIdx / aW) * aW;
+    int ay = aIdx / aW;
+    int bx = bIdx - (bIdx / bW) * bW;
+    int by = bIdx / bW;
+
     sum += unpackFloat(texelFetch(u_a, ivec2(ax, ay), 0)) * unpackFloat(texelFetch(u_b, ivec2(bx, by), 0));
   }
   fragColor = packFloat(sum);
